@@ -73,6 +73,8 @@ int main() {
   string rankArray [35];
   string suitArray [35];
 
+ cout << "\nLoading Game. Please wait.......";
+
   while(menuFlag == false) {
      //call function to load the cards into the game array
      getCards( rankArray, suitArray);
@@ -169,22 +171,25 @@ void getRules(){
 
   cout << string(50, '\n');
   cout << blue <<  "\nHigh-Low Wiz Game Show Mode:";
-   cout << "\nOnce you win the High-low 10 Board Card Challenge,\n";
+   cout << "\n*Once you win the High-low 10 Board Card Challenge,\n";
    cout << "you can then go onto the 7 board Money Card Challenge.\n";
   cout << "\nThe High-low 10 Board Card Challenge:";
-  cout << "\nYou have 5 rounds to finish the 10-card game board.";
-  cout << "\nYou lose a round if you have an incorrect answer or use a freeze.";
-  cout << "\nOn the 5th round, you have to complete the game board.";
+  cout << "\n*You have 5 continues to finish the 10-card game board.";
+  cout << "\n*You lose a continue if you have an incorrect answer.";
+  cout << "\n*When you have no continues left you have to complete the game board.";
   cout << "\nwithout any incorrect guesses or the game is over.";
-  cout << "\nYou can also change your base card once per round.";
-  cout << "\nRemember, a tie results in a loss.\n";
+   cout << "\n*You have 3 chances to freeze your card after a correct";
+  cout << "\nanswer, otherwise you have to go back to the beginning ";
+  cout << "\nor at the last place you used a freeze";
+  cout << "\n*You can also change your base card once per round.";
+  cout << "\n*Remember, a tie results in a loss.\n";
   cout << "\nThe 7 board Money Card Challenge: ";
-  cout << "\nYou are starting out with $10,000";
+  cout << "\n*You are starting out with $10,000";
   cout << "\nYour bet must be between $1,000 and $10,000\n";
       cout << "and be multiples of $1,000.\n";
-  cout << "On the final card, you must bet at least half your balance. ";
-  cout << "\nOne card may be changed before any turn in this round.";
-  cout << "\nRemember, a tie results in a loss.\n";
+  cout << "*On the final card, you must bet at least half your balance. ";
+  cout << "\n*One card may be changed before any turn in this round.";
+  cout << "\n*Remember, a tie results in a loss.\n";
  
   cout << "\n\nPress ENTER to return to the main menu.";
   cin.get();
@@ -241,26 +246,36 @@ int tenCardGame(string rankArray[], string suitArray[]){
   int cardCount = 0;
   bool roundLoss = false;
   int freezePoint = 0;
-  int turns = 1;
+  int turns = 5;
+  int saves = 3;
+  int ctr = 1;
   bool changeFlag = false;
   int changeCount = 15;
 
    Color::Modifier def(Color::FG_DEFAULT);
    Color::Modifier red(Color::FG_RED);
    Color::Modifier blue(Color::FG_BLUE);
+   Color::Modifier green(Color::FG_GREEN);
 
   cout << def << "\n\nPlayer 1, what is your name? ";
   cin.ignore();
   getline(cin, player.name);
+
+  while( player.name == ""){
+    cout << def << "\nPlayer 1, what is your name? ";
+    cin.ignore();
+    getline(cin, player.name);
+  }
   cout << "Okay, " << player.name << ". Let us begin.";
   cout << "\npress any key TWICE to continue.";
   cin.ignore();
       cin.get();
 
-  while(roundLoss == false && cardCount < 9 && turns <= 5)
+  while(roundLoss == false && cardCount < 9 && turns >= 0)
   {
      cout << string(50, '\n');
-     cout << "\n\nRound: " << turns << "\n\n";
+     cout <<green << "\n\nContinues Left: " << turns;
+     cout << "\nFreezes Left: " << saves << def << "\n\n";
      if(cardCount == 0){
         cout << "Your base card is the " << red << rankArray [cardCount] << " of " << suitArray [cardCount];
      }
@@ -316,7 +331,7 @@ int tenCardGame(string rankArray[], string suitArray[]){
         {
 
       cout << def << "\n\nNo, Incorrect guess, " <<  player.name;
-      if (turns < 5)
+      if (turns > 0)
       {
          cout << "\nYou have to go back to card # " << freezePoint+1 <<"\n";
          cout << "\n\nPress ENTER to continue.";
@@ -324,9 +339,10 @@ int tenCardGame(string rankArray[], string suitArray[]){
          cin.get();
       }
            cardCount = freezePoint;
-           rankArray [cardCount+1] = rankArray [turns+ 9];
-           suitArray [cardCount+1] = suitArray [turns+9];
-           turns +=1;
+           rankArray [cardCount+1] = rankArray [ctr+ 9];
+           suitArray [cardCount+1] = suitArray [ctr +9];
+           ctr +=1;
+           turns -=1;
            changeFlag = false;
     }
     else
@@ -335,15 +351,16 @@ int tenCardGame(string rankArray[], string suitArray[]){
 
       if(cardCount < 8)
       {
-        if (turns <5){
+        if (saves >0){
          cout << "\n\nDo you want to freeze your card (f) or continue (c). ";
          cin >> freezeIt;
          if (freezeIt == 'f')
          {
            freezePoint = (cardCount+1);
            cardCount +=1;
-           turns +=1;
+           saves -=1;
            changeFlag = false;
+           cout << "\nYou have frozen your position on the board. ";
            cout << "\nLet's go to the next card. ";
            cout << "\n\nPress ENTER to continue.";
            cin.ignore();
@@ -369,7 +386,7 @@ int tenCardGame(string rankArray[], string suitArray[]){
     }
   }
 
-  if(turns > 5)
+  if(turns < 0)
   {
     cout << "\n\nSorry, you lose.  GAME OVER.";
     return 2;
@@ -407,7 +424,12 @@ int sevenCardMoneyGame(string rankArray[], string suitArray[]){
 
   cout << def <<"\n\nPlayer 1, what is your name? ";
   cin.ignore();
-  getline(cin, player.name);
+
+   while( player.name == ""){
+    cout << def << "Player 1, what is your name? ";
+    cin.ignore();
+    getline(cin, player.name);
+  }
   cout << "Okay, " << player.name << ". Let us start the 7 board Money Card Challenge.\n";
   cout << "\npress any key TWICE to continue.";
   cin.ignore();
